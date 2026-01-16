@@ -44,25 +44,6 @@ class DocumentManager:
         """Return the path to the stored PDF, ensuring it exists."""
         return self._ensure_document(doc_id)
 
-    @staticmethod
-    def _pixmap_from_bytes(raw_bytes: bytes) -> fitz.Pixmap:
-        with Image.open(io.BytesIO(raw_bytes)) as pil_img:
-            if pil_img.mode not in {"RGB", "RGBA"}:
-                pil_img = pil_img.convert("RGBA")
-
-            if pil_img.mode == "RGBA":
-                samples = pil_img.tobytes()
-                pix = fitz.Pixmap(
-                    fitz.csRGBA, pil_img.width, pil_img.height, samples
-                )
-            else:
-                samples = pil_img.convert("RGB").tobytes()
-                pix = fitz.Pixmap(
-                    fitz.csRGB, pil_img.width, pil_img.height, samples
-                )
-
-        return pix
-
     def save_pdf(self, file_bytes: bytes) -> Tuple[str, int]:
         doc_id = uuid.uuid4().hex
         path = self._document_path(doc_id)
@@ -151,7 +132,7 @@ class DocumentManager:
         if target is None:
             raise ValueError("Image index not found on page")
 
-        pix = self._pixmap_from_bytes(new_image_bytes)
+        pix = fitz.Pixmap(new_image_bytes)
 
         with fitz.open(path) as doc:
             page = doc.load_page(page_number - 1)
