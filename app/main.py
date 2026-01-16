@@ -102,7 +102,7 @@ async def replace_image(
     image_index: int,
     file: UploadFile = File(...),
 ) -> ReplaceImageResponse:
-    if file.content_type not in ("image/png", "image/jpeg", "image/jpg", "image/webp"):
+    if file.content_type not in ("image/png", "image/jpeg", "image/jpg"):
         raise HTTPException(status_code=400, detail="Only image uploads are supported")
 
     new_bytes = await file.read()
