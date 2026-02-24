@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = "/api";
 
 const statusBadge = document.querySelector("#statusBadge");
 const uploadForm = document.querySelector("#uploadForm");
@@ -367,7 +367,7 @@ function appendThumbnail(pageNumber, dataUrl) {
 }
 
 function buildApiUrl(path, params) {
-  const url = new URL(`${API_BASE}/${path}`);
+  const url = new URL(`${API_BASE}/${path}`, window.location.origin);
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.set(key, value);
   });
