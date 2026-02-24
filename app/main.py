@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, Response, UploadFile
+from fastapi import FastAPI, File, HTTPException, Response, UploadFile, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from .document_manager import DocumentManager
 from .schemas import (
@@ -29,8 +30,9 @@ app.add_middleware(
 storage_dir = Path(__file__).resolve().parent.parent / "storage"
 document_manager = DocumentManager(storage_dir)
 
+api = APIRouter(prefix="/api")
 
-@app.post("/upload", response_model=UploadResponse)
+@api.post("/upload", response_model=UploadResponse)
 async def upload_pdf(file: UploadFile = File(...)) -> UploadResponse:
     if file.content_type not in ("application/pdf", "application/octet-stream"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
@@ -39,8 +41,7 @@ async def upload_pdf(file: UploadFile = File(...)) -> UploadResponse:
     doc_id, page_count = document_manager.save_pdf(file_bytes)
     return UploadResponse(document_id=doc_id, page_count=page_count)
 
-
-@app.get("/preview", response_model=PagePreviewResponse)
+@api.get("/preview", response_model=PagePreviewResponse)
 def get_page_preview(
     document_id: str, page_number: int, zoom: float = 2.0, response: Response = None
 ) -> PagePreviewResponse:
@@ -63,7 +64,7 @@ def get_page_preview(
     )
 
 
-@app.get("/images", response_model=PageImagesResponse)
+@api.get("/images", response_model=PageImagesResponse)
 def list_page_images(
     document_id: str, page_number: int, response: Response = None
 ) -> PageImagesResponse:
@@ -95,7 +96,7 @@ def list_page_images(
     )
 
 
-@app.post("/replace", response_model=ReplaceImageResponse)
+@api.post("/replace", response_model=ReplaceImageResponse)
 async def replace_image(
     document_id: str,
     page_number: int,
@@ -118,7 +119,7 @@ async def replace_image(
     )
 
 
-@app.get("/document/{document_id}")
+@api.get("/document/{document_id}")
 def download_document(document_id: str) -> FileResponse:
     try:
         pdf_path = document_manager.get_pdf_file(document_id)
@@ -132,6 +133,11 @@ def download_document(document_id: str) -> FileResponse:
     )
 
 
-@app.get("/health")
+@api.get("/health")
 def health() -> JSONResponse:
     return JSONResponse({"status": "ok"})
+
+app.include_router(api)
+
+static_dir = Path(__file__).resolve().parent.parent / "static"
+app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
