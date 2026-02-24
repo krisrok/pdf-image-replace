@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Image Surgeon</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="hero">
+        <div class="hero__content">
+          <h1>PDF Image Surgeon</h1>
+          <p>
+            Replace images inside complex PDFs with pixel-perfect precision. Upload, target, and swap in high-fidelity graphics suitable for academic or professional submission.
+          </p>
+        </div>
+        <div class="hero__status" id="statusBadge">Idle</div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel panel--upload">
+          <h2> Upload PDF</h2>
+          <form id="uploadForm" class="form">
+            <label class="file-picker">
+              <input type="file" id="pdfFile" accept="application/pdf" required />
+              <span>Browse PDF</span>
+            </label>
+            <button type="submit" class="btn">Upload & Analyse</button>
+          </form>
+          <div class="meta" id="documentMeta" hidden>
+            <p><strong>Document ID:</strong> <span id="docIdDisplay"></span></p>
+            <p><strong>Pages:</strong> <span id="pageCountDisplay"></span></p>
+          </div>
+          <div class="panel__actions" id="postUploadActions" hidden>
+            <a id="downloadPdf" class="btn btn--ghost" href="#" download>
+              Download Edited PDF
+            </a>
+          </div>
+        </section>
+
+        <section class="panel panel--preview" id="previewPanel" hidden>
+          <div class="panel__header">
+            <h2>2. Inspect Page</h2>
+            <div class="page-selector">
+              <label for="pageSelect">Page</label>
+              <input type="number" id="pageSelect" min="1" value="1" />
+              <button id="goToPage" class="btn btn--ghost">Go</button>
+            </div>
+          </div>
+          <div class="preview-container">
+            <div class="preview-stage" id="previewStage">
+              <img id="pagePreview" alt="PDF page preview" />
+              <div id="overlayLayer" class="overlay-layer"></div>
+            </div>
+            <aside class="gallery" id="imageGallery"></aside>
+          </div>
+          <div class="thumbnail-strip" id="thumbnailStripContainer" hidden>
+            <div class="thumbnail-strip__header">
+              <h3>Pages</h3>
+            </div>
+            <div class="thumbnail-strip__scroller" id="thumbnailStrip"></div>
+          </div>
+        </section>
+
+        <section class="panel panel--replace" id="replacePanel" hidden>
+          <h2>Replace Image</h2>
+          <form id="replaceForm" class="form form--inline">
+            <div class="target-meta" id="targetMeta"></div>
+            <label class="file-picker">
+              <input type="file" id="replacementImage" accept="image/png,image/jpeg,image/webp" required />
+              <span>Select Replacement</span>
+            </label>
+            <button type="submit" class="btn">Apply Replacement</button>
+          </form>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>
+           powerded by Techraft and Kdj        </p>
+      </footer>
+    </div>
+
+    <template id="thumbnailTemplate">
+      <button class="thumbnail-card" type="button">
+        <div class="thumbnail-card__image-wrapper">
+          <img class="thumbnail-card__image" alt="Page thumbnail" />
+        </div>
+        <span class="thumbnail-card__page"></span>
+      </button>
+    </template>
+
+    <template id="imageCardTemplate">
+      <div class="image-card">
+        <div class="image-card__thumb"></div>
+        <div class="image-card__meta"></div>
+      </div>
+    </template>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
